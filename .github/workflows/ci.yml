@@ -1,0 +1,63 @@
+# .github/workflows/ci.yml
+
+name: CI Pipeline
+
+# Define quando o workflow será executado
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**  # Inclui todas as branches que começam com 'feature/'
+  pull_request:
+    branches:
+      - main
+      - develop
+      - feature/**
+
+# Define os jobs que serão executados
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Estratégia para testar em múltiplas versões do Java, se necessário
+    # Aqui, estamos usando apenas Java 21 conforme sua necessidade
+    strategy:
+      matrix:
+        java-version: [21]
+
+    # Passos a serem executados dentro do job
+    steps:
+      # Passo 1: Checkout do código
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Passo 2: Configurar o JDK
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'       # Distribuição do JDK (Temurin é recomendado)
+          java-version: ${{ matrix.java-version }}
+          cache: 'maven'                # Habilita o cache para dependências do Maven
+
+      # Passo 3: Configurar variáveis de ambiente (opcional)
+      - name: Set environment variables
+        run: echo "ENV=production" >> $GITHUB_ENV
+
+      # Passo 4: Executar o build e os testes com Maven
+      - name: Build and Test with Maven
+        run: mvn clean verify
+
+      # Passo 5: (Opcional) Gerar relatório de cobertura de testes
+      # Requer a configuração de plugins como JaCoCo no seu projeto Maven
+      - name: Generate Test Coverage Report
+        run: mvn jacoco:report
+
+      # Passo 6: (Opcional) Upload de artefatos ou relatórios
+      # Por exemplo, upload do relatório de cobertura para visualizar nos logs do GitHub Actions
+      - name: Upload Test Coverage Report
+        if: success() # Executa este passo somente se os passos anteriores tiverem sucesso
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: target/site/jacoco/index.html
