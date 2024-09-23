@@ -1,13 +1,14 @@
 package br.com.ibmec.transacao_api.dto;
 
-import br.com.ibmec.transacao_api.model.Transaction;
 import br.com.ibmec.transacao_api.model.TransactionStatus;
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@Builder
 public class TransactionResponse {
     private Long id;
     private BigDecimal amount;
@@ -15,15 +16,5 @@ public class TransactionResponse {
     private LocalDateTime timestamp;
     private TransactionStatus status;
     private String rejectionReason;
-
-    public static TransactionResponse fromEntity(Transaction transaction) {
-        TransactionResponse response = new TransactionResponse();
-        response.setId(transaction.getId());
-        response.setAmount(transaction.getAmount());
-        response.setMerchant(transaction.getMerchant());
-        response.setTimestamp(transaction.getTimestamp());
-        response.setStatus(transaction.getStatus());
-        response.setRejectionReason(transaction.getRejectionReason());
-        return response;
-    }
+    private String message; // Novo campo para mensagens de notificação
 }

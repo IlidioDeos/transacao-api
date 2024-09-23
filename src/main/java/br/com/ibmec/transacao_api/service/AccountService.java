@@ -9,7 +9,9 @@ import javax.security.auth.login.AccountNotFoundException;
 
 public interface AccountService {
     AccountResponse createAccount(CreateAccountRequest request);
-    Account getAccountByCardNumber(String cardNumber) throws AccountNotFoundException;
+    AccountResponse deactivateAccount(Long accountId);
+    Account getAccountByCardNumber(String cardNumber);
+    Account getAccountById(Long accountId); // Para facilitar testes e outras operações
     Account saveAccount(Account account);
 }
 

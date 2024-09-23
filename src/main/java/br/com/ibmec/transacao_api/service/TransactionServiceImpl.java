@@ -30,19 +30,19 @@ public class TransactionServiceImpl implements TransactionService {
     private final AccountService accountService;
     private final List<TransactionRule> transactionRules;
     private final Clock clock;
-    private final NotificationService notificationService; // Adicionado
+    private final NotificationService notificationService; // Mantido
 
     @Autowired
     public TransactionServiceImpl(TransactionRepository transactionRepository,
                                   AccountService accountService,
                                   List<TransactionRule> transactionRules,
                                   Clock clock,
-                                  NotificationService notificationService) { // Adicionado
+                                  NotificationService notificationService) { // Mantido
         this.transactionRepository = transactionRepository;
         this.accountService = accountService;
         this.transactionRules = transactionRules;
         this.clock = clock;
-        this.notificationService = notificationService; // Adicionado
+        this.notificationService = notificationService; // Mantido
     }
 
     @Override
@@ -75,10 +75,21 @@ public class TransactionServiceImpl implements TransactionService {
 
         logger.info("Transação aprovada: {}", savedTransaction.getId());
 
-        // Enviar notificação
+        // Chamar o serviço de notificação (mock)
         notificationService.sendTransactionNotification("cliente@example.com", savedTransaction.getId());
 
-        return TransactionResponse.fromEntity(savedTransaction);
+        // Definir a mensagem de notificação
+        String message = "Transação autorizada com sucesso.";
+
+        return TransactionResponse.builder()
+                .id(savedTransaction.getId())
+                .amount(savedTransaction.getAmount())
+                .merchant(savedTransaction.getMerchant())
+                .timestamp(savedTransaction.getTimestamp())
+                .status(savedTransaction.getStatus())
+                .rejectionReason(savedTransaction.getRejectionReason())
+                .message(message) // Incluir a mensagem na resposta
+                .build();
     }
 
     @Override
@@ -87,10 +98,9 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new TransactionNotFoundException("Transação não encontrada."));
 
-        // Lógica de notificação, por exemplo, enviar email, webhook, etc.
+        // Simular notificação
         logger.info("Notificando transação: {}", transactionId);
-
-        // Exemplo: Enviar um e-mail de notificação
         notificationService.sendTransactionNotification("cliente@example.com", transactionId);
     }
 }
+

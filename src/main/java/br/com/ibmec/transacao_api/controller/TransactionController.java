@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.AccountNotFoundException;
 
-
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
@@ -34,3 +33,4 @@ public class TransactionController {
         transactionService.notifyTransaction(transactionId);
     }
 }
+
